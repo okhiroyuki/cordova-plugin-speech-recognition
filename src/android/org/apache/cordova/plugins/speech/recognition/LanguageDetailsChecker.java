@@ -1,6 +1,6 @@
 // http://stackoverflow.com/a/10548680
 
-package com.pbakondy;
+package org.apache.cordova.plugins.speech.recognition;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,7 +19,7 @@ public class LanguageDetailsChecker extends BroadcastReceiver {
 
     private List<String> supportedLanguages;
     private String languagePreference;
-    private CallbackContext callbackContext;
+    private final CallbackContext callbackContext;
 
     public LanguageDetailsChecker(CallbackContext callbackContext) {
         super();
