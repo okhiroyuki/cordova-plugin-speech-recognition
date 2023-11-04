@@ -1,6 +1,6 @@
 // https://developer.android.com/reference/android/speech/SpeechRecognizer.html
 
-package com.pbakondy;
+package org.apache.cordova.plugins.speech.recognition;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import android.Manifest;
-import android.os.Build;
 import android.os.Bundle;
 
 import android.speech.RecognitionListener;
@@ -35,7 +34,6 @@ public class SpeechRecognition extends CordovaPlugin {
 
   private static final String LOG_TAG = "SpeechRecognition";
 
-  private static final int REQUEST_CODE_PERMISSION = 2001;
   private static final int REQUEST_CODE_SPEECH = 2002;
   private static final String IS_RECOGNITION_AVAILABLE = "isRecognitionAvailable";
   private static final String START_LISTENING = "startListening";
@@ -66,13 +64,10 @@ public class SpeechRecognition extends CordovaPlugin {
     context = webView.getContext();
     view = webView.getView();
 
-    view.post(new Runnable() {
-      @Override
-      public void run() {
-        recognizer = SpeechRecognizer.createSpeechRecognizer(activity);
-        SpeechRecognitionListener listener = new SpeechRecognitionListener();
-        recognizer.setRecognitionListener(listener);
-      }
+    view.post(() -> {
+      recognizer = SpeechRecognizer.createSpeechRecognizer(activity);
+      SpeechRecognitionListener listener = new SpeechRecognitionListener();
+      recognizer.setRecognitionListener(listener);
     });
   }
 
@@ -181,12 +176,7 @@ public class SpeechRecognition extends CordovaPlugin {
     if (showPopup) {
       cordova.startActivityForResult(this, intent, REQUEST_CODE_SPEECH);
     } else {
-      view.post(new Runnable() {
-        @Override
-        public void run() {
-          recognizer.startListening(intent);
-        }
-      });
+      view.post(() -> recognizer.startListening(intent));
     }
   }
 
@@ -216,9 +206,6 @@ public class SpeechRecognition extends CordovaPlugin {
   }
 
   private boolean audioPermissionGranted(String type) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-      return true;
-    }
     return cordova.hasPermission(type);
   }
 
@@ -231,7 +218,7 @@ public class SpeechRecognition extends CordovaPlugin {
   }
 
   @Override
-  public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+  public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
       this.callbackContext.success();
     } else {
